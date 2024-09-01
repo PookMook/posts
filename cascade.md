@@ -32,9 +32,8 @@ One last stop before we start: I would like to define a few things to ensure we 
 ## CSS Files and its Bear Traps
 
 CSS files are my first love. I used CSS, SASS, and then CSS modules (SCSS modules, actually) pretty exclusively early in my career. Life was good and simple.
-Why would a CSS enthusiast like myself be pushed to CSS-in-JS? 
+Why would a CSS enthusiast like myself be pushed to CSS-in-JS? Alright, here's how you do not make friends (1/3)
 
-### Let's make some enemies (1/3).
 As soon as the projects I worked on became bigger, involved more "legacy code," or just had more contributors, some serious bear traps started to appear everywhere.
 
 People will immediately mention the lack of collocation of styles and markup as the most problematic drawback of CSS files. I can see this argument and mostly agree that it improves the developer experience significantly, but my main concerns are more about safety, intent communication, DRY, and maintenance.
@@ -71,21 +70,25 @@ In this world of CSS-in-JS/TS, eliminating dead code is the same as in the rest 
 ## Previous gen CSS-in-JS
 
 Ok, it's now time to move on to the trendy styling library of the days, part of it was curiosity, part of it was buying into the big developer experience wins. If you need some styles, just declare a new component, and you're off to the race.
-I start to encounter a few hard walls quite quickly. I'm now convinced runtime libraries promote bad practices and should be avoided (let's make ennemies 2/3)
+I start to encounter a few hard walls quite quickly. I'm now convinced runtime libraries promote bad practices and should be avoided (how you do not make friends 2/3)
 
 ### Performance
 
-https://x.com/sebastienlorber/status/1828846945193849059?t=1YXI1Gp86HcJ1ydFJWl_xg&s=09
-
 Using react and buying into the whole re-rendering is fine mindset. Runtime libraries need to recompute styles all the time. Modifying the color prop on the element, let's blow the whole class up and regenerate a new one on the fly during the render loop. More styled components means more unnecessary calculation. We'll see with the benchmark how bad it is, but my experience tends to suggest this is the only period of my dev career that I had to worry about styling performance.
+If you are interested in this subject, you can also check https://playfulprogramming.com/posts/why-is-css-in-js-slow for more.
+
 
 ### Un-necessary DOM nesting
 Now that we have a Wrapper component, let's import that everywhere and wrap everything because HTML nodes are free, right?
 I've seen <Text> components as a series of nested components where each nesting level was hypernormalized in the name of composability (think <Wrapper><Flex><Alert>). In a way, this is recreating the atomic paradigm with extra HTML nodes.
 
+=> include Example
+
 ### Loosing touch with the HTML
 Somewhat related to the previous point. When you start creating those generic components, the HTML is slowly sidestepping away. 
 This is how you get divs inside buttons that are within spans. It technically works but creates a mess. You might not care because *it works*, but I do.
+
+=> include Example
 
 ### Extending styles is rough
 Do we really need class inheritance in our CSS?
@@ -95,8 +98,12 @@ const SuperWrapper = styled(Wrapper)``. Not a fan.
 Creating themes is defined via a kind of global object. It works well in small situations (even if not the most performant). What always ends up happening is you start using part of the theme as props to respond to different logic. If this is a primary button, pass the theme.primary.text as the color prop to the component. This means runtime evaluation of the styles (performance again), this means wrapping your parent component in a withTheme HoC (performance once again) and leaking styles into the logic.
 There's a way to solve this if you are really strict about it, like enforcing generic props to drive variance (more on that later). That would be setting a prop as role: 'Primary' | 'Secondary' | 'neutral' and do the theme switching in the style declaration. In practice people will take the shortcut and
 
+=> include Example
+
 ### Type safety is rough
 Most of those libraries rely on manually annotating the allowed styles styled.div<{role: 'Primary' | 'Secondary' | 'neutral'}>`...`, This once again technically works but is an extra step that really doesn't have to exist (the function has all the information it needs to infer the types), and in practice gets skipped quite often and you are back with a big `any` on the props.
+
+=> include Example
 
 ### Debugging is rough
 As someone that often look at the raw HTML and jump between section of the markup there, the barrage of generated class names makes my life so much harder.
@@ -105,7 +112,7 @@ Same for targeting element in E2E test environment, not that you should use thos
 
 ## Jumping on the tailwind boat
 
-A lot of the success of tailwind I believe is due to the lack of good alternative to author styles nicely with limited chances to burn yourselves. For all application development purposes, Tailwind maybe is already past the goal post. As a design system guy, I still have a few gripes with it.
+A lot of the success of tailwind I believe is due to the lack of good alternative to author styles nicely with limited chances to burn yourselves. For all application development purposes, Tailwind maybe is already past the goal post. As a design system guy, I still have a few gripes with it (how you do not make friends 3/3)
 
 ### New syntax
 Weakest arguments there is, it feels wrong to learn a new DSL (even if it's just text) that compiles back to the one you already know. Meh
@@ -119,15 +126,10 @@ To have a good time using tailwind, you need to get some extra tooling in place.
 ### Nerfing your CSS.
 Losing specificity and the cascade means working with a less capable tool. This is a trade-off to get a simpler more direct styling. Some will find this trade-off as beneficial.
 
-#### Specificity
-When using tailwind, the order you define conflicting classes in HTML have little to do about how your HTML nodes will be styled. After all, Tailwind and other atomic CSS libraries are *just CSS*, they need to abide by the same rules. The last declared class in the CSS file is the one that wins (and that file is written by someone else).
-Two options are open to you as an atomic user: Use a tool in your editor to order the classes in the same order as the CSS (what tailwind does, and admittedly will help gzip compress better your HTML), and/or introduce runtime de-duplication (performance!?) like panda/styleX or CVA/tw-merge for tailwind.
-All of this is handled by the speficity rules in regular CSS: Let's introduce now an un-named semantic CSS library: `.button` is the main style definition, `.button.importance-primary` can be a variant, `.button.importance-primary.flag-disabled` can be a compount variant. The styling engine in your browser handles all of that for you simply, automatically, and quickly. Atomic styling can't do that.
-
 #### Styling at a distance
 This is dangerous to go alone on this one, but crafting design systems with styling at a distance is great for intent communication:
-- In design system you often need to target direct children, :after/before pseudo elements and so on
-- Modifying the styles depending on the context of the element. If you make sure to always define it on the affected selector, life will be good
+- In design systems you often need to target direct children, :after/before pseudo elements and so on
+- Modifying the styles depending on the context of the element. As long as you make sure to always define it on the affected selector, life will be good
 ``` No bueno
 .alert {
  background: red;
@@ -149,12 +151,38 @@ This is dangerous to go alone on this one, but crafting design systems with styl
 }
 ```
 
+
+#### Specificity
+When using tailwind, the order you define conflicting classes in HTML have little to do about how your HTML nodes will be styled. After all, Tailwind and other atomic CSS libraries are *just CSS*, they need to abide by the same rules. The last declared class in the CSS file is the one that wins (and that file is written by someone else).
+Two options are open to you as an atomic user: Use a tool in your editor to order the classes in the same order as the CSS (what tailwind does, and admittedly will help gzip compress better your HTML), and/or introduce runtime de-duplication (performance!?) like panda/styleX or CVA/tw-merge for tailwind.
+All of this is handled by the speficity rules in regular CSS: Let's introduce now an un-named semantic CSS library: `.button` is the main style definition, `.button.importance-primary` can be a variant, `.button.importance-primary.flag-disabled` can be a compount variant. The styling engine in your browser handles all of that for you simply, automatically, and quickly. Atomic styling can't do that.
+
+=> include Example
+
+
+### Working with already styled libraries/components
+
+When you import components that includes their own styles, overwriting styles becomes tricky when your styling solution is willfully bailing out of using specificity.
+Thankfully, this may become less and less of a problem with the explosion of unstyled components libraries and "copy/paste the source code into your codebase" like shadcn ui.
+
+=> include Example
+
 ### coloration of your styles / lack of coloration
+When you are building a design system, you can set how people are going to interface with it. Inside a company you can contraint the use of specific tools to make sure everything works nicely together, limit the context switching between different libraries and patterns. 
+Facebook for instance chose to use stylex for it's design system and everything styling related. The problem with this approach is now, you have to use stylex for everything CSS related forever. This is what I would call coloration of your styles.
+In the same vein, if your design system relies on Panda or Tailwind (with tw merge and/or CVA), if you want to keep the safety of being able to inject your styles on the application side. You do have to use the corresponding library.
+On the opposite side of same coin, if you use another styling solution, you open yourselves to surprises depending on your setup, like which stylesheet gets declared last.
+One of the newer CSS addition, CSS layer can help address this problem quite directly (and enables the variant-first styling patterns). it becomes trivial to have your design system styles, and allow any other styles applied to gracefully overwride yours without fightning specificity, nesting and so on. More on that later.
+
+=> include Example
 
 ### CSS moving target
+
+Nothing really prevents Tailwind from adopting CSS layers (even if the atomic nature would work against itself there). CSS Anchor positioning, :has and :is, and a slew of new features are/will be dropping into browsers. In some ways, the CSS winter being over means a lot of work to maintain (atomic) styling libraries.
 Each new feature requires the Tailwind team (and other libraries like it) to implement it in their tools. This means in practice that the library is never "finished" and will always be in flux. Also means you have to wait for it to be in the library to use. Maybe once again, it's a good thing a protects you from yourselves. I like using @supports rules personnaly to give a little better experience to some of my users / try out features being flags.
 
-## Current Production home
+
+## Last stepping stone
 As mentionned before, I'm using stitches as my main styling library nowadays. It solves most of the issues mentionned above. But the company maintaining it got sold and is now been un-maintained for a few years. Still because it uses very standard CSS, I can work around most of its quirks by just declaring a little css here and there.
 
 ### Variant-first API is the way
@@ -162,15 +190,16 @@ As mentionned before, using specificity in CSS to handle variance is simple, cle
 It also makes reading the styles extremely clear, prevents extending styles for now reason. If styles are related but different, they might just be variants. (insert loki joke)
 Discoverability of styles is greater, use your LSP to see what's available.
 TypeScript has a field day inferring props.
+WIth the adoption of CSS layers into all the major browsers, the output of a variant first library becomes extremly flexible. it includes multiple layers for the base styles, the variants the compound variants, and for the application to overwrite them. In practive this means you can use tailwind or any other library / your own CSS classes to overwrite the styles of components created by such a library.
+=> include Example
 
 ### Theming done right
 All the theme tokens are defined as CSS variables. Open for anyone to use/modify/override as you see fit. Dark theme? sure just define css variable under an @media query. Prefer using the color-scheme, sure go ahead.
+=> include Example
 
 ### We're in the endgame now
-If using an un-maintained library for more than 2 years without issue isn't a sign that we're finally getting to a stable place, I don't know what is.
+If using an un-maintained library for more than 2 years without major issue isn't a sign that we're finally getting to a stable place, I don't know what is.
 A new feature drops into CSS, browser supports it, just gotta update your TS definitions and we can use it.
-
-
 
 ## Finally reaching the end goal post
 
@@ -186,9 +215,9 @@ Static extraction solves both problems by leveraging existing tools:
 ### Libraries
 
 Some libraries to statically extract CSS-in-JS are 
- - vanilla extract (not ideal DX)
+ - vanilla extract
  - linaria
- - Pigment (very early)
+ - Pigment
 
 But the tooling to build one yourself and do what you want is getting quite accessible
 - Parcel Macros allows you to write css files and attach them to your bundler of choice. Inspired by bun macros and zig comp-time.
@@ -198,22 +227,4 @@ Using libraries like this removes a significant portion of the work and lets aut
 
 I hope to see an explosion of solutions, all targeting a slightly difference niche use-case. May the best/most generic/better weighted trade-off one wins
 
-
-For instance Using Parcel Macros / Lightning CSS + dumb CSS generation means you are keeping up with CSS for close to 0 upkeep.
-
-
-## Additional notes
-
-### CSS winter is over
-If you read Adam's blog post, the reasoning to go from semantic => atomic makes perfect sense. We are not living in this world anymore. A bunch of CSS capabilities showed up in the recent years and reshaped the landscape of CSS solutions.
-
-@layer API is great, this is what you should ask your design system library to use. This prevents the coloration of your CSS tools you can use.
-
-The cascade is a blessing, it wasn't before the :has selectors, interraction at a distance etc. Overwriting css Variables, easy peasy. Dialog and the Popover API fix one of the remaining issues with the cascade
-
- 
-### Generative UIs
-At some point you are going to have to ships CSS along your components. Doing a big fat bundled css may works for a lot of use cases, but how do you deal with extra CSS, you will need/want critical CSS + extra anyway.
-
-
-
+For instance Using Parcel Macros / Lightning CSS + dumb CSS generation means you are keeping up with CSS for close to near 0 upkeep.
