@@ -225,6 +225,6 @@ But the tooling to build one yourself and do what you want is getting quite acce
 - WyW-in-JS is a framework to build statically extracted libraries.
 Using libraries like this removes a significant portion of the work and lets author focus on what's really important: The API (the fabled DX) and the trade-offs complexity/capabilities that fits their needs.
 
-I hope to see an explosion of solutions, all targeting a slightly difference niche use-case. May the best/most generic/better weighted trade-off one wins
+I hope to see an explosion of solutions, all targeting a slightly difference niche use-case. May the best/most generic/better weighted trade-off one wins.
 
-For instance Using Parcel Macros / Lightning CSS + dumb CSS generation means you are keeping up with CSS for close to near 0 upkeep.
+For instance Using Parcel Macros / Lightning CSS + dumb CSS generation means you are keeping up with CSS for close to near 0 upkeep. Such library could be written in a couple hundred lines of code (less if you want to keep typescript out of the loop).
