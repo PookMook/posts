@@ -1,3 +1,5 @@
+# Embrace the cascade
+
 There are two groups of people who argue a lot about styling: the CSS files people and the Tailwind users. Every now and then, some blog posts hit pieces are written to try to convince the other side that they are wrong and should see the light. 
 This post is not one of those; I want to showcase the shortcomings and wins of both sides and explain why I'm personally looking for a more middle-ground approach.
 
