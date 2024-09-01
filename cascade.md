@@ -1,14 +1,14 @@
 # Embrace the cascade
 
-There are two groups of people who argue a lot about styling: the CSS files people and the Tailwind users. Every now and then, some blog posts hit pieces are written to try to convince the other side that they are wrong and should see the light. 
+Two groups argue about styling: the CSS files people and the Tailwind users. Every now and then, some blog posts hit pieces are written to try to convince the other side that they are wrong and should see the light. 
 This post is not one of those; I want to showcase the shortcomings and wins of both sides and explain why I'm personally looking for a more middle-ground approach.
 
 ## Biases
 
 Before we start, I would like to disclose my biases to provide some context for the post:
 
- - I mainly write CSS in the context of design systems. As an application developer, I really don't want to have to make micro-decisions about styling on every element.
- - I like CSS; I studied CSS Zen Garden (Kyoto Gardens being the clearly superior theme) back in the day, and I believe it's a fantastic language.
+ - I mainly write CSS in the context of design systems. As an application developer, I don't want to have to make micro-decisions about styling on every element.
+ - I like CSS; I studied CSS Zen Garden (Kyoto Gardens being the superior theme) back in the day, and I believe it's a fantastic language.
  - I never found a home in BEM. Just like Tailwind, it deprives you of the cascade/specificity.
  - I appreciate what TypeScript has done for the JavaScript ecosystem. I like types.
  - I'm a little burned out by refactoring styles from one system to another or living in hybrid-styled products that implement styles in a few different ways.
@@ -17,15 +17,15 @@ Before we start, I would like to disclose my biases to provide some context for 
 
 ## Benchmarks
 
-The elephant in the room is benchmarks. I will explore this aspect in a follow-up post, as it's a difficult topic and we should always take one-dimensional or micro-benchmarks with a grain of salt.
+The elephants in the room are benchmarks. I will explore this aspect in a follow-up post, as it's a difficult topic and we should always take one-dimensional or micro-benchmarks with a grain of salt.
 For now, I would like to ask you what threshold you consider relevant for performance differences. What kind of performance are you looking for (at compile time, initial load, re-paints)? 
-Make sure to mark those numbers somewhere, like in the comments (hi, engagement bait), and we'll revisit this with data at a later time. I would like you to come with an open mind and hear my arguments without the "utility is always faster" or "CSS files are the only way" mindsets. In the search for greatness, sometimes we may forget what is actually good.
+Make sure to mark those numbers somewhere, like in the comments (hi, engagement bait), and we'll revisit this with data at a later time. I would like you to come with an open mind and hear my arguments without the "utility is always faster" or "CSS files are the only way" mindsets. In the search for greatness, sometimes we may forget what is good.
 
 ## Setting the Table
 
 One last stop before we start: I would like to define a few things to ensure we are speaking about the same concepts:
 
- - CSS files: This includes any sort of manual CSS assignment, straight .css files, SASS, SCSS, Stylus, CSS modules (controversial pick right there).
+ - CSS files: This includes any kind of manual CSS assignment, straight .css files, SASS, SCSS, Stylus, and CSS modules (controversial pick right there).
  - Atomic libraries: Any library that relies on utility class names, where the style composition happens in the HTML. Think of Tailwind, Panda, Stylex, etc.
  - Runtime CSS-in-JS: Any styling libraries that generate stylesheets on the client. If these libraries allow for runtime string interpolation, I will refer to them as Satan.
  - Statically extracted: CSS-in-JS where the styles are generated at build time. Once generated, it is virtually equivalent to CSS files.
@@ -61,7 +61,7 @@ CSS is very freeform, and that's a good thing. You can build it as complex as yo
 
  - .wrapper.wrapper.wrapper {} to artificially boost specificity
  - A few !important declarations here and there
- - Classes impacting children 4, 5, 6, or more nesting levels below (or worst, no direct nesting relations specified).
+ - Classes impacting children 4, 5, 6, or more nesting levels below (or worse, no direct nesting relations specified).
  - People relying on unrelated parts of the styles (think a #root div {} rule). Refactoring those less specific rules always comes with a fair share of breaking unrelated styles.
  - A bunch of deprecated classes that no one removes because it's scary and might break something completely unrelated.
 
@@ -71,12 +71,12 @@ In this world of CSS-in-JS/TS, eliminating dead code is the same as in the rest 
 
 ## Previous gen CSS-in-JS
 
-Ok, it's now time to move on to the trendy styling library of the days, part of it was curiosity, part of it was buying into the big developer experience wins. If you need some styles, just declare a new component, and you're off to the race.
+Ok, it's now time to move on to the trendy styling library of the day, part of it was curiosity, and part of it was buying into the big developer experience wins. If you need some styles, just declare a new component, and you're off to the race.
 I start to encounter a few hard walls quite quickly. I'm now convinced runtime libraries promote bad practices and should be avoided (how you do not make friends 2/3)
 
 ### Performance
 
-Using react and buying into the whole re-rendering is fine mindset. Runtime libraries need to recompute styles all the time. Modifying the color prop on the element, let's blow the whole class up and regenerate a new one on the fly during the render loop. More styled components means more unnecessary calculation. We'll see with the benchmark how bad it is, but my experience tends to suggest this is the only period of my dev career that I had to worry about styling performance.
+Using react and buying into the whole "re-rendering is fine" mindset. Runtime libraries need to recompute styles all the time. Modifying the color prop on the element, let's blow the whole class up and regenerate a new one on the fly during the render loop. More styled components mean more unnecessary calculations. We'll see with the benchmark how bad it is, but my experience tends to suggest this is the only period of my dev career that I had to worry about styling performance.
 If you are interested in this subject, you can also check https://playfulprogramming.com/posts/why-is-css-in-js-slow for more.
 
 
@@ -86,51 +86,51 @@ I've seen <Text> components as a series of nested components where each nesting 
 
 => include Example
 
-### Loosing touch with the HTML
+### Losing touch with the HTML
 Somewhat related to the previous point. When you start creating those generic components, the HTML is slowly sidestepping away. 
 This is how you get divs inside buttons that are within spans. It technically works but creates a mess. You might not care because *it works*, but I do.
 
 => include Example
 
 ### Extending styles is rough
-Do we really need class inheritance in our CSS?
+Do we need class inheritance in our CSS?
 const SuperWrapper = styled(Wrapper)``. Not a fan.
 
 ### Theming is rough
-Creating themes is defined via a kind of global object. It works well in small situations (even if not the most performant). What always ends up happening is you start using part of the theme as props to respond to different logic. If this is a primary button, pass the theme.primary.text as the color prop to the component. This means runtime evaluation of the styles (performance again), this means wrapping your parent component in a withTheme HoC (performance once again) and leaking styles into the logic.
-There's a way to solve this if you are really strict about it, like enforcing generic props to drive variance (more on that later). That would be setting a prop as role: 'Primary' | 'Secondary' | 'neutral' and do the theme switching in the style declaration. In practice people will take the shortcut and
+Creating themes is defined via a kind of global object. It works well in small situations (even if not the most performant). What always ends up happening is you start using part of the theme as props to respond to different logic. If this is a primary button, pass the theme.primary.text as the color prop to the component. This means runtime evaluation of the styles (performance again), this means wrapping your parent component in a withTheme HoC (performance once again), and leaking styles into the logic.
+There's a way to solve this if you are strict about it, like enforcing generic props to drive variance (more on that later). That would be setting a prop as role: 'Primary' | 'Secondary' | 'neutral' and doing the theme switching in the style declaration. In practice, people will take the shortcut and
 
 => include Example
 
 ### Type safety is rough
-Most of those libraries rely on manually annotating the allowed styles styled.div<{role: 'Primary' | 'Secondary' | 'neutral'}>`...`, This once again technically works but is an extra step that really doesn't have to exist (the function has all the information it needs to infer the types), and in practice gets skipped quite often and you are back with a big `any` on the props.
+Most of those libraries rely on manually annotating the allowed styles styled.div<{role: 'Primary' | 'Secondary' | 'neutral'}>`...`, This once again technically works but is an extra step that doesn't have to exist (the function has all the information it needs to infer the types), and in practice gets skipped quite often and you are back with a big `any` on the props.
 
 => include Example
 
 ### Debugging is rough
-As someone that often look at the raw HTML and jump between section of the markup there, the barrage of generated class names makes my life so much harder.
+As someone who often looks at the raw HTML and jumps between sections of the markup there, the barrage of generated class names makes my life so much harder.
 Those class names are also difficult to trace back in breadcrumbs bug reports like sentry, user clicked on `div.kj98 > button.ga45.ew84`, cool cool cool.
-Same for targeting element in E2E test environment, not that you should use those, but it's a nice to have available in some situations.
+Same for targeting elements in the E2E testing environment, not that you should use those, but it's nice to have available in some situations.
 
 ## Jumping on the tailwind boat
 
-A lot of the success of tailwind I believe is due to the lack of good alternative to author styles nicely with limited chances to burn yourselves. For all application development purposes, Tailwind maybe is already past the goal post. As a design system guy, I still have a few gripes with it (how you do not make friends 3/3)
+A lot of the success of Tailwind I believe is due to the lack of good alternatives to author styles nicely with limited chances to burn yourselves. For all application development purposes, Tailwind may be already past the goal post. As a design system guy, I still have a few gripes with it (how you do not make friends 3/3)
 
 ### New syntax
-Weakest arguments there is, it feels wrong to learn a new DSL (even if it's just text) that compiles back to the one you already know. Meh
+The weakest argument there is, that it feels wrong to learn a new DSL (even if it's just text) that compiles back to the one you already know. Meh
 
 ### Tools required
-To have a good time using tailwind, you need to get some extra tooling in place. 
+To have a good time using Tailwind, you need to get some extra tooling in place. 
 - The class name ordering extension is a must, more on that very soon
-- The watcher to build your style as you author them. Over the years the compiler has become better and better. But due to how tailwind works, it's difficult to ensure it works 100% of the time in edge case scenarios like interpolated class names etc.
+- The watcher to build your style as you author them. Over the years the compiler has become better and better. But due to how tailwind works, it's difficult to ensure it works 100% of the time in edge case scenarios like interpolated class names, etc.
 - At some point, you will need something like CVA and/or tw-merge, more on that later.
 
 ### Nerfing your CSS.
-Losing specificity and the cascade means working with a less capable tool. This is a trade-off to get a simpler more direct styling. Some will find this trade-off as beneficial.
+Losing specificity and the cascade means working with a less capable tool. This is a trade-off to get a simpler more direct styling. Some will find this trade-off beneficial.
 
 #### Styling at a distance
 This is dangerous to go alone on this one, but crafting design systems with styling at a distance is great for intent communication:
-- In design systems you often need to target direct children, :after/before pseudo elements and so on
+- In design systems, you often need to target direct children, :after/before pseudo-elements and so on
 - Modifying the styles depending on the context of the element. As long as you make sure to always define it on the affected selector, life will be good
 ``` No bueno
 .alert {
@@ -155,26 +155,26 @@ This is dangerous to go alone on this one, but crafting design systems with styl
 
 
 #### Specificity
-When using tailwind, the order you define conflicting classes in HTML have little to do about how your HTML nodes will be styled. After all, Tailwind and other atomic CSS libraries are *just CSS*, they need to abide by the same rules. The last declared class in the CSS file is the one that wins (and that file is written by someone else).
+When using tailwind, the order you define conflicting classes in HTML has little to do with how your HTML nodes will be styled. After all, Tailwind and other atomic CSS libraries are *just CSS*, they need to abide by the same rules. The last declared class in the CSS file is the one that wins (and that file is written by someone else).
 Two options are open to you as an atomic user: Use a tool in your editor to order the classes in the same order as the CSS (what tailwind does, and admittedly will help gzip compress better your HTML), and/or introduce runtime de-duplication (performance!?) like panda/styleX or CVA/tw-merge for tailwind.
-All of this is handled by the speficity rules in regular CSS: Let's introduce now an un-named semantic CSS library: `.button` is the main style definition, `.button.importance-primary` can be a variant, `.button.importance-primary.flag-disabled` can be a compount variant. The styling engine in your browser handles all of that for you simply, automatically, and quickly. Atomic styling can't do that.
+All of this is handled by the specificity rules in regular CSS: Let's introduce now an un-named semantic CSS library: `.button` is the main style definition, `.button.importance-primary` can be a variant, `.button.importance-primary.flag-disabled` can be a compound variant. The styling engine in your browser handles all of that for you simply, automatically, and quickly. Atomic styling can't do that.
 
 => include Example
 
 
 ### Working with already styled libraries/components
 
-When you import components that includes their own styles, overwriting styles becomes tricky when your styling solution is willfully bailing out of using specificity.
+When you import components that include their styles, overwriting styles becomes tricky when your styling solution is willfully bailing out of using specificity.
 Thankfully, this may become less and less of a problem with the explosion of unstyled components libraries and "copy/paste the source code into your codebase" like shadcn ui.
 
 => include Example
 
-### coloration of your styles / lack of coloration
-When you are building a design system, you can set how people are going to interface with it. Inside a company you can contraint the use of specific tools to make sure everything works nicely together, limit the context switching between different libraries and patterns. 
-Facebook for instance chose to use stylex for it's design system and everything styling related. The problem with this approach is now, you have to use stylex for everything CSS related forever. This is what I would call coloration of your styles.
-In the same vein, if your design system relies on Panda or Tailwind (with tw merge and/or CVA), if you want to keep the safety of being able to inject your styles on the application side. You do have to use the corresponding library.
-On the opposite side of same coin, if you use another styling solution, you open yourselves to surprises depending on your setup, like which stylesheet gets declared last.
-One of the newer CSS addition, CSS layer can help address this problem quite directly (and enables the variant-first styling patterns). it becomes trivial to have your design system styles, and allow any other styles applied to gracefully overwride yours without fightning specificity, nesting and so on. More on that later.
+### coloration of your styles/lack of coloration
+When you are building a design system, you can set how people are going to interface with it. Inside a company, you can control the use of specific tools to make sure everything works nicely together, and limit the context switching between different libraries and patterns. 
+Facebook for instance chose to use styleX for its design system and everything styling-related. The problem with this approach is now, you have to use styleX for everything CSS-related forever. This is what I would call the coloration of your styles.
+In the same vein, when your design system relies on Panda or Tailwind (with tw-merge and/or CVA) if you want to keep the safety of being able to inject your styles on the application side, you do have to use the corresponding library.
+On the opposite side of the same coin, if you use another styling solution, you open yourselves to surprises depending on your setup, like which stylesheet gets declared last.
+One of the newer CSS additions, CSS layers can help address this problem quite directly (and enables the variant-first styling patterns). it becomes trivial to have your design system styles, and allow any other styles applied to gracefully override yours without fighting specificity, nesting, and so on. More on that later.
 
 => include Example
 
