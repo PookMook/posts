@@ -137,8 +137,8 @@ This is dangerous to go alone on this one, but crafting design systems with styl
  background: red;
  color:white;
  & .button.delete: {
-     text:red;
-     background:white;
+ text:red;
+ background:white;
  }
 }
 ```
@@ -147,8 +147,8 @@ This is dangerous to go alone on this one, but crafting design systems with styl
  background: red;
  color:white;
  .alert &: {
-     text:red;
-     background:white;
+ text:red;
+ background:white;
  }
 }
 ```
@@ -180,33 +180,33 @@ One of the newer CSS additions, CSS layers can help address this problem quite d
 
 ### CSS moving target
 
-Nothing really prevents Tailwind from adopting CSS layers (even if the atomic nature would work against itself there). CSS Anchor positioning, :has and :is, and a slew of new features are/will be dropping into browsers. In some ways, the CSS winter being over means a lot of work to maintain (atomic) styling libraries.
-Each new feature requires the Tailwind team (and other libraries like it) to implement it in their tools. This means in practice that the library is never "finished" and will always be in flux. Also means you have to wait for it to be in the library to use. Maybe once again, it's a good thing a protects you from yourselves. I like using @supports rules personnaly to give a little better experience to some of my users / try out features being flags.
+Nothing prevents Tailwind from adopting CSS layers (even if the atomic nature would work against itself there). CSS Anchor positioning, :has and :is, and a slew of new features are/will be dropping into browsers. In some ways, the CSS winter being over means a lot of work to maintain (atomic) styling libraries.
+Each new feature requires the Tailwind team (and other libraries like it) to implement it in their tools. This means in practice that the library is never "finished" and will always be in flux. Also means you have to wait for it to be in the library to use. Maybe once again, it's a good thing a protects you from yourselves. I like using @supports rules personally to give a little better experience to some of my users / try out features being flags.
 
 
 ## Last stepping stone
-As mentionned before, I'm using stitches as my main styling library nowadays. It solves most of the issues mentionned above. But the company maintaining it got sold and is now been un-maintained for a few years. Still because it uses very standard CSS, I can work around most of its quirks by just declaring a little css here and there.
+As mentioned before, I'm using stitches as my main styling library nowadays. It solves most of the issues mentioned above. But the company maintaining it got sold and is now been un-maintained for a few years. Still, because it uses very standard CSS, I can work around most of its quirks by just declaring a little CSS here and there.
 
 ### Variant-first API is the way
-As mentionned before, using specificity in CSS to handle variance is simple, clear and fast. barely any runtime costs.
-It also makes reading the styles extremely clear, prevents extending styles for now reason. If styles are related but different, they might just be variants. (insert loki joke)
+As mentioned before, using specificity in CSS to handle variance is simple, clear, and fast. barely any runtime costs.
+It also makes reading the styles extremely clear and prevents extending styles for no reason. If styles are related but different, they might just be variants (insert Loki joke).
 Discoverability of styles is greater, use your LSP to see what's available.
 TypeScript has a field day inferring props.
-WIth the adoption of CSS layers into all the major browsers, the output of a variant first library becomes extremly flexible. it includes multiple layers for the base styles, the variants the compound variants, and for the application to overwrite them. In practive this means you can use tailwind or any other library / your own CSS classes to overwrite the styles of components created by such a library.
+With the adoption of CSS layers into all the major browsers, the output of a variant first library becomes extremely flexible. it includes multiple layers for the base styles, the variants the compound variants, and for the application to overwrite them. In practice, this means you can use Tailwind or any other library / your own CSS classes to overwrite the styles of components created by such a library.
 => include Example
 
 ### Theming done right
-All the theme tokens are defined as CSS variables. Open for anyone to use/modify/override as you see fit. Dark theme? sure just define css variable under an @media query. Prefer using the color-scheme, sure go ahead.
+All the theme tokens are defined as CSS variables. Open for anyone to use/modify/override as you see fit. Dark theme? sure just define CSS variables under an @media query. Prefer using the color-scheme, sure go ahead.
 => include Example
 
 ### We're in the endgame now
-If using an un-maintained library for more than 2 years without major issue isn't a sign that we're finally getting to a stable place, I don't know what is.
+If using an un-maintained library for more than 2 years without major issues isn't a sign that we're finally getting to a stable place, I don't know what is.
 A new feature drops into CSS, browser supports it, just gotta update your TS definitions and we can use it.
 
 ## Finally reaching the end goal post
 
 The last remaining hurdles are 
-- keeping up with React and other frontend libs/framework. Stitches breaks with RSC for instance.
+- keeping up with React and other frontend libs/frameworks. Stitches breaks with RSC for instance.
 - The exported type definitions are not ideal (and quite slow)
 
 ### Static extraction
@@ -222,11 +222,11 @@ Some libraries to statically extract CSS-in-JS are
  - Pigment
 
 But the tooling to build one yourself and do what you want is getting quite accessible
-- Parcel Macros allows you to write css files and attach them to your bundler of choice. Inspired by bun macros and zig comp-time.
-- CSS lightning lets you not worry about mimification, vendor pre-fixing and all of that.
+- Parcel Macros allows you to write CSS files and attach them to your bundler of choice. Inspired by bun macros and zig comp-time.
+- CSS lightning lets you not worry about mimification, vendor pre-fixing, and all of that.
 - WyW-in-JS is a framework to build statically extracted libraries.
-Using libraries like this removes a significant portion of the work and lets author focus on what's really important: The API (the fabled DX) and the trade-offs complexity/capabilities that fits their needs.
+Using libraries like this removes a significant portion of the work and lets the author focus on what's important: The API (the fabled DX) and the trade-off complexity/capabilities that fit their needs.
 
-I hope to see an explosion of solutions, all targeting a slightly difference niche use-case. May the best/most generic/better weighted trade-off one wins.
+I hope to see an explosion of solutions, all targeting a slightly difference niche use case. May the best/most generic/better-weighted trade-off win.
 
-For instance Using Parcel Macros / Lightning CSS + dumb CSS generation means you are keeping up with CSS for close to near 0 upkeep. Such library could be written in a couple hundred lines of code (less if you want to keep typescript out of the loop).
+For instance, Using Parcel Macros / Lightning CSS + dumb CSS generation means you are keeping up with CSS for close to near 0 upkeep. Such a library could be written in a couple hundred lines of code (less if you want to keep typescript out of the loop).
