@@ -1,6 +1,6 @@
 # Embrace the cascade
 
-Two groups argue about styling: the CSS files people and the Tailwind users. Every now and then, some blog posts hit pieces are written to try to convince the other side that they are wrong and should see the light.
+Two groups argue about styling: the CSS files people and the Tailwind users. Now and then, some blog posts hit pieces are written to try to convince the other side that they are wrong and should see the light.
 This post is not one of those; I want to showcase the shortcomings and wins of both sides and explain why I'm personally looking for a more middle-ground approach.
 
 ## Biases
@@ -206,7 +206,7 @@ A new feature drops into CSS; browsers support it; just update your TS definitio
 ## Finally reaching the end goal post
 
 The last remaining hurdles are
-- keeping up with React and other frontend libraries/frameworks. Stitches breaks with RSC, for instance.
+- keeping up with React and other front-end libraries/frameworks. Stitches breaks with RSC, for instance.
 - The exported type definitions are not ideal (and quite slow to infer).
 
 ### Static extraction
@@ -223,7 +223,7 @@ Some libraries to statically extract CSS-in-JS are
 
 But the tooling to build one yourself and do what you want is getting quite accessible.
 - Parcel Macros allows you to write CSS files and attach them to your bundler of choice. Inspired by bun macros and zig comp-time.
-- CSS lightning lets you not worry about mimification, vendor prefixing, and all of that.
+- CSS lightning lets you not worry about minification, vendor prefixing, and all of that.
 - WyW-in-JS is a framework to build statically extracted libraries.
 Using libraries like this removes a significant portion of the work and lets the author focus on what's important: the API (the fabled DX) and the trade-off complexity and capabilities that fit their needs.
 
