@@ -27,7 +27,7 @@ One last stop before we start: I would like to define a few things to ensure we 
 
 - CSS files: This includes any kind of manual CSS assignment, straight .css files, SASS, SCSS, Stylus, and CSS modules (controversial pick right there).
 - Atomic libraries: Any library that relies on utility class names, where the style composition happens in the HTML. Think of Tailwind, Panda, Stylex, etc.
-- Runtime CSS-in-JS: Any styling libraries that generate stylesheets on the client. If these libraries allow for runtime string interpolation, I will refer to them as Satan.
+- Runtime CSS-in-JS: Any styling libraries that generate stylesheets on the client. If these libraries allow for runtime string interpolation, my experience tends to suggest that they get abused.
 - Statically extracted: CSS-in-JS where the styles are generated at build time. Once generated, it is virtually equivalent to CSS files.
 - CSS-in-TS: Essentially CSS-in-JS but with type safety as a first-class citizen, whether it's at runtime or build time.
 
@@ -205,14 +205,14 @@ A new feature drops into CSS; browsers support it; just update your TS definitio
 
 ## Finally reaching the end goal post
 
-The last remaining hurdles are
+The last remaining hurdles when you are using stitches are:
 - keeping up with React and other front-end libraries/frameworks. Stitches breaks with RSC, for instance.
 - The exported type definitions are not ideal (and quite slow to infer).
 
 ### Static extraction
-Static extraction solves both problems by leveraging existing tooling:
-- CSS module injections: Already working with RSC, generative UIs
-- Types just need to know about variants, the rest is generated at build time.
+Static extraction turns your CSS-in-JS library into static CSS files that your bundler can now bundle however it wants. This solves the 2 previously mentioned
+- CSS module injections: Already working with RSC, and generative UIs as those workflows are used by the static CSS people.
+- Types just need to know about variants, actual runtime only adds a few class names to the HTML nodes, the rest is generated at build time.
 
 ### Libraries
 
@@ -221,11 +221,12 @@ Some libraries to statically extract CSS-in-JS are
 - linaria
 - Pigment
 
-But the tooling to build one yourself and do what you want is getting quite accessible.
-- Parcel Macros allows you to write CSS files and attach them to your bundler of choice. Inspired by bun macros and zig comp-time.
+But the tooling to build one yourself and do what you want is getting quite accessible at a rapid pace.
+- Parcel Macros allows you to run Javascript at build time to write CSS files and attach them to your bundler of choice. Inspired by bun macros and zig comp-time.
 - CSS lightning lets you not worry about minification, vendor prefixing, and all of that.
 - WyW-in-JS is a framework to build statically extracted libraries.
-Using libraries like this removes a significant portion of the work and lets the author focus on what's important: the API (the fabled DX) and the trade-off complexity and capabilities that fit their needs.
+
+Using libraries like this removes a significant portion of the work and lets the author focus on what's important: the API (and by extension DX) and the trade-off between complexity and capabilities that fit their needs.
 
 I hope to see an explosion of solutions, all targeting a slightly different niche use case. May the best/most generic/better-weighted trade-off win.
 
