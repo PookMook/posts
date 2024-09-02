@@ -230,4 +230,4 @@ Using libraries like this removes a significant portion of the work and lets the
 
 I hope to see an explosion of solutions, all targeting a slightly different niche use case. May the best/most generic/better-weighted trade-off win.
 
-For instance, using Parcel Macros and Lightning CSS, associated with dumb CSS generation, means you are keeping up with CSS for close to near-zero upkeep. Such a library could be written in a couple hundred lines of code (less if you want to keep typescript out of the loop).
+For instance, using Parcel Macros and Lightning CSS, associated with dumb CSS generation, means you are keeping up with CSS for close to near-zero upkeep. Such a library could be written [in a couple hundred lines of code](https://github.com/PookMook/boomer-css/blob/main/src/libs/boomer.ts) (less if you want to keep typescript out of the loop).
